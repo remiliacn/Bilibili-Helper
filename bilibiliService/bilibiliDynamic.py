@@ -1,4 +1,4 @@
-import requests, json
+<import requests, json, os
 
 headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36"
@@ -10,6 +10,7 @@ class BilibiliDynamic:
         self.baseUrl = 'https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/space_history?visitor_uid=0&host_uid=%s&offset_dynamic_id=0' % uuid
         self.contentDict = self._getDict()
         self.lastContent = self._getLastContent()
+        self.dynamicPictures = self._getDynamicPictures()
 
     def _getDict(self):
         try:
@@ -60,6 +61,20 @@ class BilibiliDynamic:
         if response == '':
             response += 'emmmm这个uid为%d的人好像没有发布任何动态呢' % self.uid
         return response
+
+    def _getDynamicPictures(self):
+        pictures = self.contentDict['item']['pictures']
+        for picture in pictures:
+            img_src = picture['img_src']
+            filename = os.path.basename(img_src)
+            try:
+                response = requests.get(img_src, headers=headers)
+                with open(filename, 'wb') as f:
+                    f.write(response.content)
+                return os.path.realpath(filename)
+            except Exception as e:
+                print('Error occurred when getting pictures %s' % e)
+                return {'-1' : ''}
 
     def _getOriginDict(self):
         try:
