@@ -77,7 +77,7 @@ class BilibiliDynamic:
             except Exception as e:
                 print('Error occurred when getting picture %s' % e)
         if img_path == []:
-            return return {'-1' : ''}
+            return {'-1' : ''}
         else:
             return img_path
                
