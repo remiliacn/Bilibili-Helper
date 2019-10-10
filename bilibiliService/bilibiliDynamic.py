@@ -64,6 +64,7 @@ class BilibiliDynamic:
 
     def _getDynamicPictures(self):
         pictures = self.contentDict['item']['pictures']
+        img_path = []
         for picture in pictures:
             img_src = picture['img_src']
             filename = os.path.basename(img_src)
@@ -71,11 +72,15 @@ class BilibiliDynamic:
                 response = requests.get(img_src, headers=headers)
                 with open(filename, 'wb') as f:
                     f.write(response.content)
-                return os.path.realpath(filename)
+                path = os.path.realpath(filename)
+                img_path.append(path)
             except Exception as e:
-                print('Error occurred when getting pictures %s' % e)
-                return {'-1' : ''}
-
+                print('Error occurred when getting picture %s' % e)
+        if img_path == []:
+            return return {'-1' : ''}
+        else:
+            return img_path
+               
     def _getOriginDict(self):
         try:
             return json.loads(self.contentDict['origin'])
