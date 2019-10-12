@@ -1,4 +1,4 @@
-import requests, re, json
+import requests, re, json, time
 
 class bilibiliTopic:
     def __init__(self, topic):
@@ -8,7 +8,7 @@ class bilibiliTopic:
         self.picList = self._getPicList()
 
     def _getContent(self):
-        response = requests.get(self.baseUrl)
+        response = requests.get(self.baseUrl, timeout=10)
         contentDict = response.json()
         if contentDict['code'] != 0:
             return {'-1' : 'Invalid Content'}
