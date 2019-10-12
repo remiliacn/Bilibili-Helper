@@ -1,8 +1,9 @@
-import requests, json, os
+import requests, json, os, re
 
 headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36"
 }
+
 
 class BilibiliDynamic:
     def __init__(self, uuid):
@@ -17,11 +18,11 @@ class BilibiliDynamic:
             page = requests.get(self.baseUrl, headers=headers).content.decode('utf-8')
         except Exception as e:
             print('Error occurred when getting dynamic %s' % e)
-            return {'-1' : ''}
+            return {'-1': ''}
 
         json_data = json.loads(page)
         if len(json_data['data']) == 0 or json_data['data']['has_more'] == 0:
-            return {'-1' : ''}
+            return {'-1': ''}
 
         return json.loads(json_data['data']['cards'][0]['card'])
 
@@ -63,24 +64,28 @@ class BilibiliDynamic:
         return response
 
     def _getDynamicPictures(self):
-        pictures = self.contentDict['item']['pictures']
         img_path = []
+        try:
+            pictures = self.contentDict['item']['pictures']
+        except KeyError:
+            return img_path
+
         for picture in pictures:
             img_src = picture['img_src']
-            filename = os.path.basename(img_src)
+            filepath = 'E:/bilibiliPic/'
             try:
-                response = requests.get(img_src, headers=headers)
-                with open(filename, 'wb') as f:
+                response = requests.get(img_src, headers=headers, timeout=15)
+                pictureName = re.findall(r'\w+\.[jpgni]{3}', img_src)[0]
+                response.raise_for_status()
+                with open(filepath + pictureName, 'wb') as f:
                     f.write(response.content)
-                path = os.path.realpath(filename)
+                path = filepath + pictureName
                 img_path.append(path)
             except Exception as e:
                 print('Error occurred when getting picture %s' % e)
-        if img_path == []:
-            return {'-1' : ''}
-        else:
-            return img_path
-               
+
+        return img_path
+
     def _getOriginDict(self):
         try:
             return json.loads(self.contentDict['origin'])
@@ -88,4 +93,10 @@ class BilibiliDynamic:
             return ''
 
     def getLastContent(self):
+        if not self.dynamicPictures:
+            return self.lastContent
+
+        for elements in self.dynamicPictures:
+            self.lastContent += '[CQ:image,file=file:///%s]' % elements
+
         return self.lastContent
