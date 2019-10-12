@@ -19,9 +19,7 @@ class bilibiliTopic:
         if 'item' in self.contentList and 'pictures' in self.contentList['item']:
             if len(self.contentList['item']['pictures']) >= 1:
                 return True
-
-            return False
-
+            
         return False
 
     def _getPicList(self):
