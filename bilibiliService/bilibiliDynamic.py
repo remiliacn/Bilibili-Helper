@@ -75,7 +75,7 @@ class BilibiliDynamic:
             filepath = 'E:/bilibiliPic/'
             try:
                 response = requests.get(img_src, headers=headers, timeout=15)
-                pictureName = re.findall(r'\w+\.[jpgni]{3}', img_src)[0]
+                pictureName = re.findall(r'\w+\.[jpgnif]{3}', img_src)[0]
                 response.raise_for_status()
                 with open(filepath + pictureName, 'wb') as f:
                     f.write(response.content)
