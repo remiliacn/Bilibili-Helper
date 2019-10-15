@@ -77,10 +77,13 @@ class BilibiliDynamic:
                 response = requests.get(img_src, headers=headers, timeout=15)
                 pictureName = re.findall(r'\w+\.[jpgnif]{3}', img_src)[0]
                 response.raise_for_status()
-                with open(filepath + pictureName, 'wb') as f:
-                    f.write(response.content)
-                path = filepath + pictureName
-                img_path.append(path)
+                fileName = filepath + pictureName
+                if not os.path.exists(fileName):
+                    with open(fileName, 'wb') as f:
+                        f.write(response.content)
+
+                img_path.append(fileName)
+
             except Exception as e:
                 print('Error occurred when getting picture %s' % e)
 
